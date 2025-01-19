@@ -4,7 +4,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class ForkJoinPoolExample {
     public static void main(String[] args) {
-        int n = 100000;
+        int n = 10000;
         final long[] timeFJP = new long[1];
         final long[] timeNoFJP = new long[1];
 
