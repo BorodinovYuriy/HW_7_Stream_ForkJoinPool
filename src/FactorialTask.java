@@ -3,53 +3,54 @@ import java.util.concurrent.RecursiveTask;
 
 class FactorialTask extends RecursiveTask<BigInteger> {
     private final int n;
-    private int start;
-    private int end;
+    private final int start;
+    private final int end;
+
 
     public FactorialTask(int n) {
-        this.n = n;
-    }
-    public FactorialTask(int start, int end) {
-        this.start = start;
-        this.end = end;
-        this.n = 0;
-    }
-    @Override
-    protected BigInteger compute() {
-        if (this.n != 0) {
-            return factorial(1, n);
+        if (n < 0) {
+            throw new IllegalArgumentException("Факториал не определен для отрицательных чисел");
         } else {
-            //Возврат Task для пула "new FactorialTask(start, mid)..."[ниже]
-            return factorial(start,end);
+            this.n = n;
+            this.start = 1;
+            this.end = n;
         }
     }
+    public FactorialTask(int start, int end, int n) {
+        this.start = start;
+        this.end = end;
+        this.n = n;
+    }
 
-    private BigInteger factorial(int start, int end) {
+    @Override
+    protected BigInteger compute() {
         if (start > end) {
             return BigInteger.ONE;
         }
         if (start == end) {
             return BigInteger.valueOf(start);
         }
-        if (end - start <= 10) {
+        if (end - start <= 2) {
             BigInteger result = BigInteger.ONE;
             for (int i = start; i <= end; i++) {
                 result = result.multiply(BigInteger.valueOf(i));
             }
             return result;
         }
-
         int mid = (start + end) / 2;
-
-        FactorialTask leftTask = new FactorialTask(start, mid);
-        FactorialTask rightTask = new FactorialTask(mid + 1, end);
-        //Когда поток из пула забирает leftTask,
-        //он автоматически вызывает leftTask.compute().
+        FactorialTask leftTask = new FactorialTask(start, mid, this.n);
+        FactorialTask rightTask = new FactorialTask(mid + 1, end, this.n);
         leftTask.fork();
-        //rightResult продолжается в main потоке
         BigInteger rightResult = rightTask.compute();
         BigInteger leftResult = leftTask.join();
-
         return leftResult.multiply(rightResult);
     }
+    public BigInteger computeSequentially(){
+        BigInteger result = BigInteger.ONE;
+        for (int i = start; i <= end; i++) {
+            result = result.multiply(BigInteger.valueOf(i));
+        }
+        return result;
+    }
 }
+
