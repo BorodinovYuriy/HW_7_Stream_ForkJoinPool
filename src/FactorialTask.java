@@ -30,13 +30,15 @@ class FactorialTask extends RecursiveTask<BigInteger> {
         if (start == end) {
             return BigInteger.valueOf(start);
         }
-        if (end - start <= 2) {
+        //При 10 - вычисляем на месте...
+        if (end - start <= 10) {
             BigInteger result = BigInteger.ONE;
             for (int i = start; i <= end; i++) {
                 result = result.multiply(BigInteger.valueOf(i));
             }
             return result;
         }
+
         int mid = (start + end) / 2;
         FactorialTask leftTask = new FactorialTask(start, mid, this.n);
         FactorialTask rightTask = new FactorialTask(mid + 1, end, this.n);
